@@ -2,14 +2,46 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, ScrollView, TouchableOpacity, Dimensions, SafeAreaView, Platform, TextInput, Modal, Button } from 'react-native';
 import axios from 'axios';
 export default function Home({navigation}){
-   
+    const [cities, setCities] = useState([]);
+    const [flight, setFlight] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
     const [searchFocused, setSearchFocused] = useState(false);
-    
+    const [isModalVisible, setIsModalVisible] = useState(false); // State để quản lý modal
     const screenWidth = Dimensions.get('window').width;
 
-    
+    const [selectedTab, setSelectedTab] = useState('Home'); // lưu tab được chọn
+    const handleTabPress = (tabName) => {
+        setSelectedTab(tabName); // cập nhật tab được chọn
+    };
 
-    
+
+    // const citiesData = [
+    //     { "name": "HongKong", "price": "from $33.00 to $38.00", "image": "https://snack-code-uploads.s3.us-west-1.amazonaws.com/~asset/e8c30cd3607b9098e588a8a1f7a50cdf", "id": "1" },
+    //     { "name": "San Antonio", "price": "from $48.00 to $58.00", "image": "https://snack-code-uploads.s3.us-west-1.amazonaws.com/~asset/a62c1e82f809e698768646fa1e5f21dd", "id": "2" },
+    // ]
+
+    // const Data = [
+    //     { "name": "HongKong", "price": "from $33.00 to $38.00", "image": "https://snack-code-uploads.s3.us-west-1.amazonaws.com/~asset/58cd71a4c1b265f65df0f2369fecee48", "id": "1" },
+        
+    // ]
+    useEffect(() => {
+        // Gọi API để lấy danh sách danh mục và cập nhật vào state `category`
+        axios.get('https://6724ad8dc39fedae05b25151.mockapi.io/City').then((response) => {
+            setCities(response.data);
+        });
+        axios.get('https://6724ad8dc39fedae05b25151.mockapi.io/flight').then((response) => {
+            setFlight(response.data);
+        });
+    }, []);
+    const handleLogout = () => {
+        // Logic to handle logout
+        // You can clear local storage or perform other logout operations here
+        localStorage.removeItem('name');
+        
+        // Chuyển hướng đến trang đăng nhập
+        navigation.navigate('LoginScreen');
+        setIsModalVisible(false); // Đóng modal sau khi log out
+    };
     return(
         <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
@@ -31,9 +63,9 @@ export default function Home({navigation}){
                             
                             <View style={styles.userInfoContainer}>
                             <View style={styles.userInfo}>
-                            <Image source={require('../assets/personicon.png')} style={styles.userImage}/>
+                                <Image source={require('../assets/personicon.png')} style={styles.userImage}/>
                                
-                                
+                   
                             </View>
                         </View>
                         </View>
@@ -50,15 +82,87 @@ export default function Home({navigation}){
                                 
                             </View>
                     </View>
+                {/* Khu Vực The best cities for you */}
+                <View style={styles.sectionContainer}>
+                        <Text style={styles.sectionTitle}>The best cities for you</Text>
+                        
+                    </View>
+                   
+                    <FlatList
+                        data={cities.slice(0, 3)}
+                        horizontal
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            
+                            <View style={styles.itemContainer}>
+                            <Image source={{ uri: item.image }} style={styles.locationImage} />
+                            <Text style={styles.locationName}>{item.name}</Text>
+                            <Text style={styles.locationPrice}>{item.price}</Text>
+                        </View>
+        
+                            
+                        )}
+                    />
+                {/* Khu Vực Explore Destinations */}
+                <View style={styles.sectionContainer}>
+                        <Text style={styles.sectionTitle}>Explore Destinations</Text>
+                        
+                    </View> 
 
-               
-              
-
+                    <FlatList
+                        data={flight.slice(0, 3)}
+                        horizontal
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            
+                           
+                            <Image source={{ uri: item.image }} style={styles.locationImage} />
+                            
+                        
+        
+                            
+                        )}
+                    /> 
                 
+
+
             </ScrollView>
-
+                        {/* footer */}
             
+ {/* Tạo footer */}
+ <View style={styles.bottomNav}>
+                    <TouchableOpacity style={styles.navItem} onPress={() => handleTabPress('Home')}>
+                        <Image source={require('../assets/homeicon1.png')} style={styles.footerImage} />
+                        <Text style={[styles.navLabel, selectedTab === 'Home' && styles.activeLabel]}>Home</Text>
+                    </TouchableOpacity>
 
+                    <TouchableOpacity style={styles.navItem}  onPress={() => handleTabPress('Explore')}
+                    >
+                        <Image source={require('../assets/exploreicon1.png')} style={styles.footerImage} />
+                        <Text style={[styles.navLabel, selectedTab === 'Explore' && styles.activeLabel]}>Explore</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.navItem} onPress={() =>{handleTabPress('Profile'); setIsModalVisible(true)}}> {/* Mở modal khi bấm vào nút Profile */}
+                        <Image source={require('../assets/profileicon1.png')} style={styles.footerImage} />
+                        <Text style={[styles.navLabel, selectedTab === 'Profile' && styles.activeLabel]}>Profile</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* Modal cho Logout */}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={isModalVisible}
+                    onRequestClose={() => setIsModalVisible(false)} // Đóng modal khi nhấn nút quay lại
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Are you sure you want to log out?</Text>
+                            <Button title="Log Out" onPress={handleLogout} color="#FF0000" /> {/* Xử lý log out */}
+                            <Button title="Cancel" onPress={() => setIsModalVisible(false)} /> {/* Đóng modal */}
+                        </View>
+                    </View>
+                </Modal>
         </View>
     </SafeAreaView>
     );
@@ -194,6 +298,16 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         margin: 10,
     },
+    locationName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginTop: 5,
+    },
+    locationPrice: {
+        fontSize: 14,
+        color: 'gray',
+    },
+
     locationImageOfRec: {
         width: 100,
         height: 100,
@@ -203,9 +317,16 @@ const styles = StyleSheet.create({
     bottomNav: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        padding: 10,
+        paddingHorizontal: 10, // padding ngang để giữ khoảng cách 2 bên
+        height: 50,
         borderTopWidth: 1,
         borderColor: '#ddd',
+    },
+    footerImage: {
+        width: 30,
+        height: 30,
+        borderRadius: 22.5,
+        marginRight: 5,
     },
     navItem: {
         alignItems: 'center',
@@ -231,5 +352,8 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginBottom: 20,
         textAlign: 'center',
+    },
+    activeLabel: {
+        color: '#7CDCE8', // màu chữ khi nút được chọn
     },
 });

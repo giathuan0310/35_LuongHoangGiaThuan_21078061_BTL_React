@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DatePicker from 'react-native-datepicker';
 
@@ -7,6 +7,8 @@ const FlightScreen = () => {
   const [selectedOption, setSelectedOption] = useState('Round Trip');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
+  const [departureDate, setDepartureDate] = useState(new Date());
+  const [returnDate, setReturnDate] = useState(new Date());
 
   const options = ['Round Trip', 'One Way', 'Multi City'];
 
@@ -15,8 +17,6 @@ const FlightScreen = () => {
     setFrom(to);
     setTo(temp);
   };
-  const [departureDate, setDepartureDate] = useState(new Date());
-  const [returnDate, setReturnDate] = useState(new Date());
 
   return (
     <View style={styles.container}>
@@ -45,33 +45,69 @@ const FlightScreen = () => {
 
       {selectedOption === 'Round Trip' && (
         <View style={styles.inputContainer}>
-          
-         
-          
-          <TextInput
-            style={styles.input}
-            placeholder="From"
-            value={from}
-            onChangeText={setFrom}
-          />
-        
-          
+          <View style={styles.searchBox}>
+            <Image source={require('../assets/maybayfrom.png')} style={styles.mayBayIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="From"
+              value={from}
+              onChangeText={setFrom}
+            />
+          </View>
+
           <TouchableOpacity onPress={handleSwap} style={styles.swapButton}>
             <Ionicons name="swap-horizontal" size={24} color="black" />
           </TouchableOpacity>
-          <TextInput
-            style={styles.input}
-            placeholder="To"
-            value={to}
-            onChangeText={setTo}
-          />
 
-          
+          <View style={styles.searchBox}>
+            <Image source={require('../assets/maybayTo.png')} style={styles.mayBayIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="To"
+              value={to}
+              onChangeText={setTo}
+            />
+          </View>
+
+          {/* Departure Date Picker */}
+          <View style={styles.dateContainer}>
+            <Ionicons name="calendar" size={20} color="black" />
+            {/* <DatePicker
+              style={styles.datePicker}
+              date={departureDate}
+              mode="date"
+              placeholder="Select Date"
+              format="ddd, MMM DD"
+              confirmBtnText="Confirm"
+              cancelBtnText="Cancel"
+              customStyles={{
+                dateInput: styles.dateInput,
+                dateText: styles.dateText,
+              }}
+              onDateChange={(date) => setDepartureDate(date)}
+            /> */}
+          </View>
+
+          {/* Return Date Picker */}
+          <View style={styles.dateContainer}>
+            <Ionicons name="calendar" size={20} color="black" />
+            <DatePicker
+              style={styles.datePicker}
+              date={returnDate}
+              mode="date"
+              placeholder="Select Date"
+              format="ddd, MMM DD"
+              confirmBtnText="Confirm"
+              cancelBtnText="Cancel"
+              customStyles={{
+                dateInput: styles.dateInput,
+                dateText: styles.dateText,
+              }}
+              onDateChange={(date) => setReturnDate(date)}
+            />
+          </View>
         </View>
-
       )}
-
-
     </View>
   );
 };
@@ -81,7 +117,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     backgroundColor: '#fff',
-    justifyContent: 'flex-start', // Ensure elements start from the top
+    justifyContent: 'flex-start',
   },
   backIcon: {
     position: 'absolute',
@@ -99,41 +135,39 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   menuButton: {
-    alignItems: 'center', // Center text and underline
+    alignItems: 'center',
   },
   menuText: {
     fontSize: 16,
     color: 'black',
   },
   selectedMenuText: {
-    fontWeight: 'bold', // Make selected text bold
+    fontWeight: 'bold',
   },
   underline: {
-    marginTop: 5, // Space between text and underline
+    marginTop: 5,
     height: 2,
     width: '100%',
-    backgroundColor: 'black', // Underline color
+    backgroundColor: 'black',
   },
   inputContainer: {
     marginTop: 20,
   },
   input: {
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10, // Space between input fields
+    backgroundColor: 'transparent',
+    outlineWidth: 0,
+    flex: 1,
   },
   swapButton: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20, // Space below the swap icon
+    marginBottom: 20,
   },
   mayBayIcon: {
     width: 20,
     height: 20,
-},
-searchBox: {
+  },
+  searchBox: {
     flexDirection: 'row',
     backgroundColor: '#F3F4F6',
     justifyContent: 'space-between',
@@ -141,9 +175,31 @@ searchBox: {
     marginLeft: 10,
     borderRadius: 10,
     marginRight: 10,
-    paddingHorizontal: 10, // padding ngang để giữ khoảng cách 2 bên
-    height: 50, // điều chỉnh chiều cao theo mong muốn
-},
+    paddingHorizontal: 10,
+    height: 50,
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+    marginLeft: 10,
+    borderRadius: 10,
+    marginRight: 10,
+    paddingHorizontal: 10,
+    height: 50,
+    marginTop: 10,
+  },
+  datePicker: {
+    flex: 1,
+  },
+  dateInput: {
+    borderWidth: 0,
+    alignItems: 'flex-start',
+  },
+  dateText: {
+    fontSize: 16,
+    color: '#6b7280', // gray text color
+  },
 });
 
 export default FlightScreen;

@@ -109,6 +109,7 @@ const TravellerInformation = () => {
                                                     
                                         </View>
                                         {/* footer */}
+                                        <View style={styles.hr}/>
                                         <View style={styles.buttonContainer}>
                                                 <Text style={styles.price}>$806</Text> 
                                         </View>
@@ -189,13 +190,58 @@ const TravellerInformation = () => {
                                 </ProgressStep>
                                 {/* Step3 */}
                                 <ProgressStep label={<Ionicons name="bed" size={24} color="black" style={styles.backIcon} />}>
-                                       
+                                        <Text style={styles.title}>Seat</Text>
+
+                                        <View style={styles.hr}/>
+                                        {/* Phần  body*/}
+                                        <View style={styles.bodyiInput}>
+                                                        
+                                                        <View style={styles.containInput}>
+                                                                <label style={styles.textLabel}>Flight to New York</label>
+                                                               
+                                                                <View style={{ flexDirection: 'row',justifyContent:'space-around' }}>
+                                                                        <Image source={require('../assets/seat.png')}  />
+                                                                            <View>
+                                                                                <Text>LCY - JFK</Text>
+                                                                                <Text style={styles.checkboxSubtext}>Seats from $5</Text>
+                                                                            </View>
+                                                                            <TouchableOpacity  >
+                                                                                    <Text style={{color:"#B7AADB"}}>Select</Text>
+                                                                            </TouchableOpacity>   
+                                                                </View>
+
+                                                                <View style={styles.hr}/>
+                                                       
+                                                                <label style={styles.textLabel}>Flight to London</label>
+                                                               
+                                                                <View style={{ flexDirection: 'row',justifyContent:'space-around' }}>
+                                                                        <Image source={require('../assets/seat.png')}  />
+                                                                            <View>
+                                                                                <Text>LCY - JFK</Text>
+                                                                                <Text style={styles.checkboxSubtext}>Seats from $4.59</Text>
+                                                                            </View>
+                                                                            <TouchableOpacity  >
+                                                                                    <Text style={{color:"#B7AADB"}}>Select</Text>
+                                                                            </TouchableOpacity>   
+                                                                </View>
+
+                                                        </View>
+
+                                                    
+                                        </View>
+                                        {/* footer */}
+                                        <View style={styles.hr}/>
+                                        <View style={styles.buttonContainer}>
+                                                <Text style={styles.price}>$806</Text> 
+                                        </View>
 
                                 </ProgressStep>
                            
                                 {/* Step4 */}
                                 <ProgressStep label={<Ionicons name="card" size={24} color="black" style={styles.backIcon} />}>
-                                        
+                                            <Text style={styles.title}>Payment</Text>
+
+                                            <View style={styles.hr}/>
 
                                 </ProgressStep>
                            </ProgressSteps>

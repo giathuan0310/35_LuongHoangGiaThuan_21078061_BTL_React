@@ -5,18 +5,17 @@ import { Ionicons } from '@expo/vector-icons';
 //npm i react-native-progress-steps cài tiến trinh
 import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import { CheckBox } from 'react-native-web';
+import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
 const TravellerInformation = () => {
+    const navigation = useNavigation(); // Initialize navigation
+    //Step1
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [gender, setGender] = useState('');
     const [email, setEmail] = useState('');   
-  
     const [phone, setPhone] = useState('+07');   
   
-    //tien trinh
-    // const[step1Data,setStep1Data]=useState({name:'',address:''});
-    // const[step2Data,setStep2Data]=useState({email:'',username:''});
-    // const[step3Data,setStep3Data]=useState({password:'',retypePassword:''});
     
      //Step 2
     // Trạng thái cho các mục checkbox, sử dụng một object để lưu trữ các mục đã chọn
@@ -34,6 +33,65 @@ const TravellerInformation = () => {
             [option]: !prevOptions[option], // Chuyển đổi trạng thái của mục đã chọn
         }));
     };
+
+
+    //Step4 Thanh Toán
+    const [paymentMethods, setPaymentMethods] = useState([]);
+    const [selectedMethod, setSelectedMethod] = useState(null);
+   
+  
+  
+    useEffect(() => {
+        axios.get('https://672c6c2f1600dda5a9f86518.mockapi.io/Payment')
+          .then(response => {
+            setPaymentMethods(response.data);
+            const selected = response.data.find(method => method.selected);
+            setSelectedMethod(selected?.id || null);
+          })
+          .catch(error => console.error(error));
+      }, []);
+
+      const handleSelectMethod = (id) => {
+        setSelectedMethod(id);
+      };
+
+    
+      const renderPaymentMethod = ({ item }) => {
+        const isSelected = selectedMethod === item.id;
+    
+        return (
+          <TouchableOpacity
+            style={[styles.paymentMethod, isSelected && styles.selectedMethod]}
+            onPress={() => handleSelectMethod(item.id)}
+          >
+            <Image
+              style={styles.logo}
+              source={
+                  
+                  item.brand === 'mastercard'
+                  ? require('../assets/mastercard.png')
+                  : 'Null'
+              }
+            />
+            <Text style={styles.cardInfo}>
+              {item.type === 'PayPal' ? item.email : `****** ${item.number}`}
+            </Text>
+            <View style={styles.radioButtonContainer}>
+              <View style={[styles.radioButton, isSelected ? styles.selectedRadioButton : styles.defaultRadioButton]}>
+                {isSelected && <View style={styles.radioButtonInner} />}
+              </View>
+            </View>
+          </TouchableOpacity>
+        );
+      };
+  
+    
+
+    const handlePaymentSuccess = () => {
+        // Navigate to the PaymentSuccess screen
+       
+        navigation.navigate('PaymentSuccess');
+    };
     return (
         <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
@@ -45,7 +103,14 @@ const TravellerInformation = () => {
                             {/* Tiến trình */}
                             {/* Khu vực có thể cuộn cho nội dung toàn bộ màn hình */}
                             <ScrollView style={{ width: "100%", height: 600 }}>  
-                           <ProgressSteps>
+                           <ProgressSteps
+                                 activeStepIconColor="#00BDD6"  // Màu icon của bước hiện tại
+                                 completedStepIconColor="#00BDD6"  // Màu icon của bước đã hoàn thành
+                                 activeLabelColor="#00BDD6"  // Màu của nhãn bước hiện tại
+                                 completedLabelColor="#00BDD6"  // Màu của nhãn bước đã hoàn thành
+                                 activeStepIconBorderColor="#00BDD6"  // Màu viền của bước hiện tại
+                                 completedStepIconBorderColor="#00BDD6"  // Màu viền của bước đã hoàn thành
+                           >
                                 {/* Step1 */}
                                 <ProgressStep label={<Ionicons name="person" size={24} color="black" style={styles.backIcon} />}>
                                 <Text style={styles.title}>Traveller information</Text>
@@ -238,17 +303,84 @@ const TravellerInformation = () => {
                                 </ProgressStep>
                            
                                 {/* Step4 */}
-                                <ProgressStep label={<Ionicons name="card" size={24} color="black" style={styles.backIcon} />}>
+                                <ProgressStep label={<Ionicons name="card" size={24} color="black" style={styles.backIcon} 
+                                               
+                                />}>
                                             <Text style={styles.title}>Payment</Text>
 
                                             <View style={styles.hr}/>
+                                            
+                                            {/* body */}
+                                            <View style={styles.bodyiInput}>
+                                            <label style={styles.textLabel}>Payment method</label>
+                                                        <View style={styles.paymentContainer}>
+                                                                <FlatList
+                                                                    data={paymentMethods}
+                                                                    renderItem={renderPaymentMethod}
+                                                                    keyExtractor={item => item.id.toString()}
+                                                                    style={styles.paymentList}
+                                                                />
 
+                                                        <View style={styles.hr}/>
+                                                                
+                                                        </View>
+                                                        <View style={styles.containInput}>
+                                                                <label style={styles.textLabel}>Traveller details</label>
+                                                               
+                                                                <View style={{ flexDirection: 'row',justifyContent:'space-around' }}>
+                                                                        <Image  source={require('../assets/profileicon1.png')}  />
+                                                                            <View>
+                                                                                <Text>Pedro Moreno</Text>
+                                                                                
+                                                                            </View>
+                                                                           
+                                                                            <Text style={{color:"#AFB1B4"}}>Adult -Male</Text>
+                                                                               
+                                                                </View>
+
+                                                                <View style={styles.hr}/>
+                                                       
+                                                                <label style={styles.textLabel}>Contact details</label>
+                                                               
+                                                                <View style={{ flexDirection: 'row',justifyContent:'space-around' }}>
+                                                                        <Image source={require('../assets/mail.png')}  />
+                                                                            <View>
+                                                                                <Text>pedromoreno@gmail.com</Text>
+            
+                                                                            </View>
+                                                                              
+                                                                </View>
+                                                                <View style={styles.hr}/>
+                                                                <View style={{ flexDirection: 'row',justifyContent:'space-around' }}>
+                                                                        <Image source={require('../assets/phone.png')}  />
+                                                                            <View>
+                                                                                <Text>(208)567-8209</Text>
+            
+                                                                            </View>
+                                                                              
+                                                                </View>
+
+                                                        </View>
+
+                                                    
+                                            </View>
+                                            {/* Modal xác nhận thanh toán */}
+                                            {/* footer */}
+                                        <View style={styles.hr}/>
+                                        <View style={styles.buttonContainer}>
+                                                <Text style={styles.price}>$806</Text> 
+                                        </View>
+
+                                        {/* Thêm nút riêng để gọi handlePaymentSuccess */}
+                <TouchableOpacity style={styles.submitButton} onPress={handlePaymentSuccess}>
+                    <Text style={styles.submitButtonText}>Submit</Text>
+                </TouchableOpacity>
                                 </ProgressStep>
-                           </ProgressSteps>
-                           </ScrollView>
-                           
+                            </ProgressSteps>
+                        </ScrollView>
+                                                            
                     </View>
-                   
+                                                    
                 </View>
            
                        
@@ -369,7 +501,158 @@ ImageProtect:{
     borderRadius:5,
     borderColor:'gray'
 
-}
+},
+//step4
+paymentContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  paymentList: {
+    marginVertical: 20,
+    width: '100%',
+  },
+  paymentMethod: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 10,
+    width: '100%',
+  },
+  selectedMethod: {
+    borderColor: '#00bdd6',
+    borderWidth: 2,
+  },
+  logo: {
+    width: 50,
+    height: 50,
+    marginRight: 15,
+    resizeMode: 'contain',
+  },
+  cardInfo: {
+    fontSize: 18,
+    flex: 1,
+  },
+  payButton: {
+    backgroundColor: '#00bdd6',
+    paddingVertical: 12,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  icon: {
+    marginRight: 8,
+  },
+  payButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  radioButtonContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
+  radioButton: {
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  selectedRadioButton: {
+    borderWidth: 2,
+    borderColor: '#00bdd6',
+  },
+  defaultRadioButton: {
+    borderWidth: 2,
+    borderColor: '#ddd',
+  },
+  radioButtonInner: {
+    height: 14,
+    width: 14,
+    borderRadius: 7,
+    backgroundColor: '#00bdd6',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButtonConfirm: {
+    flex: 1,
+    backgroundColor: '#00bdd6',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  modalButtonConfirmOnePayment: {
+    flex: 1,
+    backgroundColor: '#00bdd6',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginHorizontal: 5,
+    width: '100%',
+  },
+  modalButtonTextConfirmOnePayment: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  modalButtonTextConfirm: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  modalButtonCancel: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginHorizontal: 5,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  modalButtonTextCancel: {
+    color: '#888',
+    fontWeight: 'bold',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
     });
 

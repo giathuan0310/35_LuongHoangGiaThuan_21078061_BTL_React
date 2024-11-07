@@ -6,6 +6,7 @@ import LoginScreen from './screens/LoginScreen';
 import Home from './screens/Home';
 import FlightScreen from './screens/FlightScreen';
 import TravellerInformation from './screens/TravellerInformation';
+import PaymentSuccess from './screens/PaymentSuccess';
 const Stack = createNativeStackNavigator();
 
 
@@ -17,6 +18,7 @@ export default function App() {
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="FlightScreen" component={FlightScreen} />
       <Stack.Screen name="TravellerInformation" component={TravellerInformation} />
+      <Stack.Screen name="PaymentSuccess" component={PaymentSuccess} />
     </Stack.Navigator>
   </NavigationContainer>
 

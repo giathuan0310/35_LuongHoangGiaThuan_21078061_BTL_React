@@ -50,15 +50,13 @@ app.get('/users', (req, res) => {
 
 
 // insert (post)
-app.post('/register', upload.single('avatar'), (req, res) =>{
+app.post('/register', upload.single('avatar'), (req, res) => {
     const { username, password } = req.body;
     
+    // Kiểm tra avatar, nếu không có thì dùng 'default.png'
     const avatar = req.file ? req.file.filename : 'default.png'; 
     
-    // console.log('Request body:', req.body);
-    // console.log('Uploaded file:', req.file);
-   
-    //Kiễm trả tài khoản có tồn tại chưa
+    // Kiểm tra tài khoản đã tồn tại chưa
     const sql = 'SELECT * FROM users WHERE username = ?';
     db.query(sql, [username], (err, results) => {
         if (err) {
@@ -68,14 +66,15 @@ app.post('/register', upload.single('avatar'), (req, res) =>{
         if (results.length > 0) {
             return res.json({ success: false, message: 'Tài khoản đã tồn tại' });
         }
-        // Nếu chưa có theem mới
+        // Nếu chưa có tài khoản, thêm mới vào cơ sở dữ liệu
         const insertquery = 'INSERT INTO users (username, password, avatar) VALUES (?, ?, ?)';
         db.query(insertquery, [username, password, avatar], (err, kq) => {
-        if (err) throw err;
-        res.json({ success: true, message: 'Đã thêm người dùng' });
-    });
+            if (err) throw err;
+            res.json({ success: true, message: 'Đã thêm người dùng' });
+        });
     });
 });
+
 
 // kiem tra dang nhap
 app.post('/login', (req, res) =>{

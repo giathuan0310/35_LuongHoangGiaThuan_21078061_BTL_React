@@ -1,54 +1,54 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal,Image, SafeAreaView, } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 export default function LoginScreen() {
   const navigation = useNavigation();
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [userData, setUserData] = useState(null); // Lưu dữ liệu người dùng ở đây
   const handleLogin = async () => {
-    if (!name || !password) {
+    if (!username || !password) {
       setLoginError('Bạn Phải Nhập Thông Tin!');
       setModalVisible(true); // Show modal if fields are empty
       return;
     }
  // Kiểm tra tên đăng nhập và mật khẩu cứng
- if (name === 'admin' && password === '123') {
+ if (username === 'admin' && password === '123') {
   // Nếu thông tin đúng, điều hướng đến trang quản lý
-  localStorage.setItem('name', name); // Lưu tên vào localStorage
+  localStorage.setItem('username', username); // Lưu tên vào localStorage
   navigation.navigate('Home'); // Thay đổi tên trang quản lý
   return;
 }
-    // Gọi API để xác thực thông tin người dùng
-    // fetch('http://192.168.2.58:3000/login', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ name, pass:password }), // Gửi tên và mật khẩu trong yêu cầu
-    // })
-    //   .then((response) => {
-    //     if (!response.ok) {
-    //       throw new Error('Tên đăng nhập hoặc mật khẩu không hợp lệ');
-    //     }
-    //     return response.json();
-    //   })
-    //   .then((data) => {
-    //     // Giả sử API trả về dữ liệu người dùng khi đăng nhập thành công
-    //     setUserData(data); // Lưu dữ liệu người dùng
-    //     navigation.navigate('Screen_01');
-    //     localStorage.setItem('name', name);
+    //Gọi API để xác thực thông tin người dùng
+    fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username,password }), // Gửi tên và mật khẩu trong yêu cầu
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Tên đăng nhập hoặc mật khẩu không hợp lệ');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Giả sử API trả về dữ liệu người dùng khi đăng nhập thành công
+        setUserData(data); // Lưu dữ liệu người dùng
+        navigation.navigate('Home');
+        localStorage.setItem('username', username);
      
-    //   })
-    //   .catch((error) => {
-    //     setLoginError(error.message);
-    //     setModalVisible(true); // Hiện modal với thông báo lỗi
-    //   });
+      })
+      .catch((error) => {
+        setLoginError(error.message);
+        setModalVisible(true); // Hiện modal với thông báo lỗi
+      });
   };
 
   const toggleShowPassword = () => {
@@ -56,18 +56,22 @@ export default function LoginScreen() {
   };
 
   return (
+    <SafeAreaView style={styles.safeArea}>
+      <Image source={require('../assets/banner3.jpg')} style={styles.banner} />
     <View style={styles.container}>
-      <Ionicons name="arrow-back" size={24} color="black" style={styles.backIcon} />
-      <Text style={styles.title}>Hello Again!</Text>
+      
+      
+      
+      <Text style={styles.title}>Welcome!</Text>
       <Text style={styles.subtitle}>Log into your account</Text>
 
       <View style={styles.inputContainer}>
-        <Ionicons name="mail-outline" size={20} color="gray" style={styles.icon} />
+        <Ionicons name="person-outline" size={20} color="gray" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Enter your Username"
           placeholderTextColor="#aaa"
-          onChangeText={setName} 
+          onChangeText={setUsername} 
         />
       </View>
       <View style={styles.inputContainer}>
@@ -86,8 +90,37 @@ export default function LoginScreen() {
       </View>
 
       <TouchableOpacity onPress={handleLogin} style={styles.continueButton}>
-        <Text style={styles.continueText}>Continue</Text>
+        <Text style={styles.continueText}>Login</Text>
       </TouchableOpacity>
+      <View style={styles.hr}/>
+      <TouchableOpacity  onPress={()=> navigation.navigate('Register')}>
+        <Text style={styles.RegisterText}>Register</Text>
+      </TouchableOpacity>
+
+      <View style={styles.style8}>
+        <Text style={styles.orText}>or</Text>
+      </View>
+      <View style={styles.socialContainer}>
+        <TouchableOpacity style={styles.socialButton}>
+          <Image
+            source={require("../assets/google.png")}
+            style={styles.socialIcon}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.socialButton}>
+          <Image
+            source={require("../assets/face.png")}
+            style={styles.socialIcon}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.socialButton}>
+          <Image
+            source={require("../assets/apple.png")}
+            style={styles.socialIcon}
+          />
+        </TouchableOpacity>
+      </View>
+
 
       <Modal
         animationType="slide"
@@ -104,12 +137,19 @@ export default function LoginScreen() {
           </View>
         </View>
       </Modal>
+
+
     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+},
+ container: {
     flex: 1,
     paddingHorizontal: 20,
     backgroundColor: '#fff',
@@ -176,10 +216,18 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     alignItems: 'center',
   },
+  
   continueText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  RegisterText: {
+    color: 'black',
+    fontSize: 16,
+    
+    alignItems: 'center',
+    paddingLeft:150
   },
   orContainer: {
     flexDirection: 'row',
@@ -239,4 +287,22 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end', // Aligns the content at the bottom of the screen
     marginBottom: 20, // Adds some spacing before the modal and button
   },
+  hr: {
+    width: '100%',
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 20,
+  },
+  style8: {
+    marginTop: 30,
+    alignItems:'center'
+  },
+  banner: {
+    width: 400,
+    height: 200,
+  
+    
+    
+},
+
 });

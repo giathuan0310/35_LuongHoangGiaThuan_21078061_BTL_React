@@ -603,7 +603,7 @@ const Flighttrip = ({ route, navigation }) => {
                 
                 {/* END Modal TO */}
 
-                <TouchableOpacity style={styles.searchButton}>
+                <TouchableOpacity style={styles.searchButton}  onPress={() => navigation.navigate('ResultSearchFlight')}>
                     <Text style={styles.searchButtonText}>Search flights</Text>
                 </TouchableOpacity>
             </ScrollView>

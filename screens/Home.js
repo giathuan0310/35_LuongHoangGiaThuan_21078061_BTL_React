@@ -26,7 +26,7 @@ export default function Home({navigation}){
     // ]
     useEffect(() => {
         // Gọi API để lấy danh sách danh mục và cập nhật vào state `category`
-        axios.get('https://6724ad8dc39fedae05b25151.mockapi.io/City').then((response) => {
+        axios.get('http://localhost:3000/bestcities').then((response) => {
             setCities(response.data);
         });
         axios.get('https://6724ad8dc39fedae05b25151.mockapi.io/flight').then((response) => {
@@ -73,14 +73,17 @@ export default function Home({navigation}){
                        
 
 
-                        <View style={[styles.searchBox, searchFocused && styles.inputContainerFocused]}>
-                        <Image source={require('../assets/findicon.png')} style={styles.searchIcon} />
-                                <TextInput
-                                    style={styles.searchInput}
-                                    placeholder='Find a flight'
-                                />
-                                
-                            </View>
+                        <TouchableOpacity 
+                            style={[styles.searchBox, searchFocused && styles.inputContainerFocused]} 
+                            onPress={() => navigation.navigate('Flighttrip')} // Navigate to "Flighttrip" screen
+                        >
+                            <Image source={require('../assets/findicon.png')} style={styles.searchIcon} />
+                            <TextInput
+                                style={styles.searchInput}
+                                placeholder='Find a flight'
+                                editable={false} // Make TextInput non-editable as it's just for navigating
+                            />
+                        </TouchableOpacity>
                     </View>
                 {/* Khu Vực The best cities for you */}
                 <View style={styles.sectionContainer}>

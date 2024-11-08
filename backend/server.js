@@ -92,6 +92,24 @@ app.post('/login', (req, res) =>{
         }
     });
 });
+
+app.get('/avatar/:username', (req, res) => {
+    const username = req.params.username;
+    console.log(`Fetching avatar for username: ${username}`);
+    var sql = "SELECT avatar FROM users WHERE username = ?";
+    db.query(sql, [username], (err, result) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        if (result.length > 0) {
+            res.json({ avatar: result[0].avatar });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    });
+});
+
 //Endpoint đổi mật khẩu
 app.put('/reset-password', express.json(), (req, res) => {
     

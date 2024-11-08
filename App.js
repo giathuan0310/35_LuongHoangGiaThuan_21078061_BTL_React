@@ -9,6 +9,7 @@ import TravellerInformation from './screens/TravellerInformation';
 import PaymentSuccess from './screens/PaymentSuccess';
 import Flighttrip from './screens/Flighttrip';
 import ResultSearchFlight from './screens/ResultSearchFlight';
+import Register from './screens/Register';
 const Stack = createNativeStackNavigator();
 
 
@@ -23,6 +24,8 @@ export default function App() {
       <Stack.Screen name="PaymentSuccess" component={PaymentSuccess} />
       <Stack.Screen name="Flighttrip" component={Flighttrip} />
       <Stack.Screen name="ResultSearchFlight" component={ResultSearchFlight} />
+      <Stack.Screen name="Register" component={Register} />
+    
     </Stack.Navigator>
   </NavigationContainer>
 

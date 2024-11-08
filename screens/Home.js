@@ -8,22 +8,14 @@ export default function Home({navigation}){
     const [searchFocused, setSearchFocused] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false); // State để quản lý modal
     const screenWidth = Dimensions.get('window').width;
-
+    const username = localStorage.getItem('username') || 'Khách';
+    const [avatar, setAvatar] = useState(''); // State for avatar
     const [selectedTab, setSelectedTab] = useState('Home'); // lưu tab được chọn
     const handleTabPress = (tabName) => {
         setSelectedTab(tabName); // cập nhật tab được chọn
     };
 
 
-    // const citiesData = [
-    //     { "name": "HongKong", "price": "from $33.00 to $38.00", "image": "https://snack-code-uploads.s3.us-west-1.amazonaws.com/~asset/e8c30cd3607b9098e588a8a1f7a50cdf", "id": "1" },
-    //     { "name": "San Antonio", "price": "from $48.00 to $58.00", "image": "https://snack-code-uploads.s3.us-west-1.amazonaws.com/~asset/a62c1e82f809e698768646fa1e5f21dd", "id": "2" },
-    // ]
-
-    // const Data = [
-    //     { "name": "HongKong", "price": "from $33.00 to $38.00", "image": "https://snack-code-uploads.s3.us-west-1.amazonaws.com/~asset/58cd71a4c1b265f65df0f2369fecee48", "id": "1" },
-        
-    // ]
     useEffect(() => {
         // Gọi API để lấy danh sách danh mục và cập nhật vào state `category`
         axios.get('http://localhost:3000/bestcities').then((response) => {
@@ -32,6 +24,16 @@ export default function Home({navigation}){
         axios.get('https://6724ad8dc39fedae05b25151.mockapi.io/flight').then((response) => {
             setFlight(response.data);
         });
+       
+        if (username) {
+            axios.get(`http://localhost:3000/avatar/${username}`)
+                .then((response) => {
+                    setAvatar(response.data.avatar); // Set avatar from response
+                })
+                .catch((error) => {
+                    console.error('Error fetching avatar:', error);
+                });
+        }
     }, []);
     const handleLogout = () => {
         // Logic to handle logout
@@ -63,8 +65,8 @@ export default function Home({navigation}){
                             
                             <View style={styles.userInfoContainer}>
                             <View style={styles.userInfo}>
-                                <Image source={require('../assets/personicon.png')} style={styles.userImage}/>
-                               
+                                <Image source={{ uri:avatar }} style={styles.userImage}/>
+                              
                    
                             </View>
                         </View>
@@ -160,7 +162,11 @@ export default function Home({navigation}){
                 >
                     <View style={styles.modalContainer}>
                         <View style={styles.modalContent}>
-                            <Text style={styles.modalTitle}>Are you sure you want to log out?</Text>
+                            
+                            <View>
+                                    <Text style={styles.welcomeText}>Welcome!</Text>
+                                    <Text style={styles.userName}>{username}</Text>
+                                </View>
                             <Button title="Log Out" onPress={handleLogout} color="#FF0000" /> {/* Xử lý log out */}
                             <Button title="Cancel" onPress={() => setIsModalVisible(false)} /> {/* Đóng modal */}
                         </View>

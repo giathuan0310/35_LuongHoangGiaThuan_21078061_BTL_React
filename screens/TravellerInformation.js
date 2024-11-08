@@ -270,7 +270,7 @@ const TravellerInformation = () => {
                                                                                 <Text>LCY - JFK</Text>
                                                                                 <Text style={styles.checkboxSubtext}>Seats from $5</Text>
                                                                             </View>
-                                                                            <TouchableOpacity  >
+                                                                            <TouchableOpacity  onPress={()=> navigation.navigate('Seat')} >
                                                                                     <Text style={{color:"#B7AADB"}}>Select</Text>
                                                                             </TouchableOpacity>   
                                                                 </View>

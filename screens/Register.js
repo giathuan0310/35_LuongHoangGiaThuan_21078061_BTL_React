@@ -1,65 +1,86 @@
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, SafeAreaView ,Platform,Modal} from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/EvilIcons';
-import * as ImagePicker from 'expo-image-picker'; // Sử dụng ImagePicker để chọn ảnh
+import { launchImageLibrary } from 'react-native-image-picker';
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Register({ navigation }) {
-    const [user, setUser] = useState("");
-    const [pass, setPass] = useState("");
-    const [avatar, setAvatar] = useState(null); // Thêm state để lưu ảnh
-    const [avatarName, setAvatarName] = useState(""); // Thêm state để lưu tên ảnh
+    const [photo, setPhoto] = useState(null);
+    const [username, setUserName] = useState('');
+    const [password, setPassword] = useState('');
+    const [modalVisibility, setModalVisibility] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [imageUri, setImageUri] = useState(null);
 
-    // Hàm chọn ảnh
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
+    const handleImagePicker = async () => {
+        if (Platform.OS === 'web') {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    setImageUri(URL.createObjectURL(file)); // Để hiển thị ảnh trên web
+                    setPhoto(file); // Để upload lên server
+                }
+            };
+            input.click();
+        } else {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 1,
+            });
 
-        if (!result.cancelled) {
-            setAvatar(result.uri); // Cập nhật đường dẫn ảnh
-            const filename = result.uri.split('/').pop(); // Lấy tên tệp
-            setAvatarName(filename); // Lưu tên tệp
+            if (!result.canceled) {
+                setImageUri(result.assets[0].uri);
+                setImageFile({
+                    uri: result.assets[0].uri,
+                    type: 'image/png', // type của ảnh
+                    name: 'avatar.png', // tên file
+                });
+            }
         }
     };
 
     const handleRegister = async () => {
+
+
+        if (!username || !password || !photo) {
+            setErrorMessage('Vui lòng nhập đầy đủ thông tin');
+            setModalVisibility(true);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('password', password);
+        if (Platform.OS === 'web') {
+            formData.append('avatar', photo);
+        } else {
+            formData.append('avatar', photo);
+        }
+        console.log('Photo data:', photo);
+
         try {
-            const formData = new FormData();
-            formData.append('username', user);
-            formData.append('password', pass);
-
-            // Kiểm tra và thêm ảnh vào formData
-            if (avatar) {
-                const filename = avatar.split('/').pop();
-                const match = /\.(\w+)$/.exec(filename);
-                const type = match ? `image/${match[1]}` : 'image/jpeg'; // Set image type correctly
-
-                formData.append('avatar', {
-                    uri: avatar,
-                    name: filename,
-                    type,  // Ensure correct MIME type
-                });
-            }
-
             const response = await axios.post('http://localhost:3000/register', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
-            Alert.alert("Đăng ký thành công!", response.data.message);
-            navigation.goBack();
-        } catch (error) {
-            if (error.response) {
-                Alert.alert("Lỗi", error.response.data.error || "Đăng ký thất bại");
+            if (response.status === 200) {
+                setErrorMessage('Đăng ký thành công');
+                setModalVisibility(true);
             } else {
-                Alert.alert("Lỗi", "Có lỗi xảy ra. Vui lòng thử lại sau.");
+                setErrorMessage('Đăng ký thất bại: ' + response.data.message);
+                setModalVisibility(true);
             }
+        } catch (e) {
+            console.error('Lỗi: ', e);
+            setErrorMessage('Đã xảy ra lỗi trong quá trình đăng ký.');
+            setModalVisibility(true);
         }
     };
 
@@ -68,17 +89,25 @@ export default function Register({ navigation }) {
             <Image source={require('../assets/banner3.jpg')} style={styles.banner} />
             <View style={styles.container}>
                 <View style={styles.logo}>
-                    <Text style={{ color: 'black', fontSize: 25 }}>REGISTER</Text>
+                    <Text style={{ color: 'black', fontSize: 25 ,fontWeight:'bold'}}>REGISTER</Text>
+                    <TouchableOpacity onPress={handleImagePicker} style={styles.photoButton}>
+                        {imageUri ? (<Image source={{ uri: imageUri }} style={styles.photo} />) :
+                            (<Text>Chọn ảnh của bạn</Text>)}
+                            </TouchableOpacity>
                 </View>
+
+                
                 <View style={styles.viewInput}>
+
+                        
                     <View style={styles.input}>
                         <Icon name='user' size={30} color={'black'} />
                         <TextInput
                             style={{ marginLeft: 10, flex: 1, paddingHorizontal: 10, color: 'gray' }}
                             placeholder='user name'
                             placeholderTextColor={'gray'}
-                            value={user}
-                            onChangeText={setUser}
+                            value={username}
+                            onChangeText={setUserName}
                         />
                     </View>
                     <View style={styles.input}>
@@ -88,37 +117,12 @@ export default function Register({ navigation }) {
                             placeholder='password'
                             placeholderTextColor={'gray'}
                             secureTextEntry
-                            value={pass}
-                            onChangeText={setPass}
+                            value={password}
+                            onChangeText={setPassword}
                         />
                     </View>
 
-                    {/* Nút chọn ảnh và input để hiển thị tên ảnh */}
-                    <View style={styles.input}>
-                        <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
-                            <Text style={{ fontSize: 18, color: 'black' }}>Chọn ảnh đại diện</Text>
-                        </TouchableOpacity>
-                        {/* Input để hiển thị tên ảnh */}
-                        <TextInput
-                            style={{
-                                marginLeft: 10,
-                                flex: 1,
-                                paddingHorizontal: 10,
-                                color: 'gray',
-                                borderBottomWidth: 1,
-                                borderColor: '#ccc',
-                            }}
-                            value={avatarName} // Hiển thị tên file ảnh
-                            editable={false} // Không cho chỉnh sửa
-                            placeholder="Tên ảnh"
-                        />
-                    </View>
-
-                    {avatar && (
-                        <>
-                            <Image source={{ uri: avatar }} style={{ width: 100, height: 100, marginTop: 10 }} />
-                        </>
-                    )}
+                    
 
                     <TouchableOpacity style={styles.Touch} onPress={handleRegister}>
                         <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white' }}>Register</Text>
@@ -130,6 +134,29 @@ export default function Register({ navigation }) {
                         <Text style={{ fontSize: 15, color: 'black' }}>Login</Text>
                     </TouchableOpacity>
                 </View>
+
+
+                <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisibility}
+                onRequestClose={() => setModalVisibility(false)}
+
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>THÔNG BÁO</Text>
+                        <Text style={styles.modalMessage}>{errorMessage || "Đăng ký thành công"}</Text>
+                        <View style={styles.modalButtons}>
+                       
+                            <TouchableOpacity style={styles.modalButton} onPress={() => { setModalVisibility(false), navigation.navigate('LoginScreen') }}>
+                                <Text style={styles.modalButtonText2}>Đồng ý</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+
+            </Modal>
             </View>
         </SafeAreaView>
     );
@@ -142,7 +169,7 @@ const styles = StyleSheet.create({
     },
     banner: {
         width: 400,
-        height: 200,
+        height: 100,
     },
     container: {
         flex: 1,
@@ -183,5 +210,46 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: '#ccc',
         marginVertical: 20,
+    },
+    photoButton: { alignItems: 'center' ,justifyContent: 'center', width: 150, height: 150, backgroundColor: '#e0e0e0', borderRadius: 75, marginBottom: 20 },
+    photo: { width: 150, height: 150, borderRadius: 75 },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    
+    }, modalContent: {
+        width: '80%',
+        padding: 20,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+        modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+        modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        width: '100%',
+        marginTop: 20,
+    },
+        modalButtonText2: {
+        padding: 10,
+        backgroundColor: 'green',
+        borderRadius: 5,
+        color: '#fff',
+        
+        
+    },
+        modalButtonText: {
+        padding: 10,
+        marginHorizontal: 10,
+        backgroundColor: 'red',
+        borderRadius: 5,
+        color: '#fff',
     },
 });

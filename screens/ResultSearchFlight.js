@@ -41,18 +41,24 @@ const ResultSearchFlight = () => {
     };
 
     // Chia dữ liệu thành từng cặp
-    const pairedFlightData = [];
-    for (let i = 0; i < flightData.length; i += 2) {
-        const pair = flightData.slice(i, i + 2);
-        pairedFlightData.push(pair);
-    }
+    const pairedFlightData = flightData.reduce((pairs, flight, index) => {
+        const pairIndex = Math.floor(index / 2);
+        pairs[pairIndex] = pairs[pairIndex] || [];
+        pairs[pairIndex].push(flight);
+        return pairs;
+      }, []);
+      const navigateToFlightDetails = (flight) => {
+        navigation.navigate('FlightDetails', { flight }); // Truyền thông tin chuyến bay đến màn hình chi tiết
+      };
 
     const renderFlightPair = ({ item }) => {
         // Tính tổng giá của cặp
         const totalPrice = item.reduce((total, flight) => total + flight.price, 0);
 
         return (
-            <View style={styles.cardPair}>
+
+            <TouchableOpacity key={item[0].id} onPress={() => navigateToFlightDetails(item[0])}>
+             <View style={styles.cardPair}>
                 {item.map((flight, index) => (
                     <View key={index} style={styles.card}>
                         <View style={styles.flightDetail}>
@@ -81,6 +87,8 @@ const ResultSearchFlight = () => {
                
                 
             </View>
+          </TouchableOpacity>
+           
         );
     };
     const toggleSelectAll = () => {

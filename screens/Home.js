@@ -9,7 +9,7 @@ export default function Home({navigation}){
     const [isModalVisible, setIsModalVisible] = useState(false); // State để quản lý modal
     const screenWidth = Dimensions.get('window').width;
     const username = localStorage.getItem('username') || 'Khách';
-    const [avatar, setAvatar] = useState(''); // State for avatar
+     const [avatar, setAvatar] = useState(''); // State for avatar
     const [selectedTab, setSelectedTab] = useState('Home'); // lưu tab được chọn
     const handleTabPress = (tabName) => {
         setSelectedTab(tabName); // cập nhật tab được chọn
@@ -35,6 +35,8 @@ export default function Home({navigation}){
                 });
         }
     }, []);
+
+    
     const handleLogout = () => {
         // Logic to handle logout
         // You can clear local storage or perform other logout operations here
@@ -65,7 +67,7 @@ export default function Home({navigation}){
                             
                             <View style={styles.userInfoContainer}>
                             <View style={styles.userInfo}>
-                                <Image source={{ uri:avatar }} style={styles.userImage}/>
+                                <Image  source={{ uri:avatar  }} style={styles.userImage}/>
                               
                    
                             </View>

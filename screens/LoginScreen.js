@@ -21,7 +21,7 @@ export default function LoginScreen() {
  if (username === 'admin' && password === '123') {
   // Nếu thông tin đúng, điều hướng đến trang quản lý
   localStorage.setItem('username', username); // Lưu tên vào localStorage
-  navigation.navigate('Home'); // Thay đổi tên trang quản lý
+  navigation.navigate('AdminDashboard'); // Thay đổi tên trang quản lý
   return;
 }
     //Gọi API để xác thực thông tin người dùng
@@ -39,11 +39,21 @@ export default function LoginScreen() {
         return response.json();
       })
       .then((data) => {
-        // Giả sử API trả về dữ liệu người dùng khi đăng nhập thành công
-        setUserData(data); // Lưu dữ liệu người dùng
-        navigation.navigate('Home');
-        localStorage.setItem('username', username);
-     
+        // Kiểm tra role và điều hướng
+        if (data.success) {
+          setUserData(data.user); // Lưu dữ liệu người dùng
+          localStorage.setItem('username', username);
+
+          // Điều hướng tùy theo role
+          if (data.role === 'admin') {
+            navigation.navigate('AdminDashboard'); // Điều hướng đến trang AdminDashboard nếu role là admin
+          } else {
+            navigation.navigate('Home'); // Điều hướng đến trang Home nếu role là người dùng bình thường
+          }
+        } else {
+          setLoginError(data.message);
+          setModalVisible(true); // Hiện modal với thông báo lỗi
+        }
       })
       .catch((error) => {
         setLoginError(error.message);

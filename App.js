@@ -11,7 +11,8 @@ import Flighttrip from './screens/Flighttrip';
 import ResultSearchFlight from './screens/ResultSearchFlight';
 import Seat from './screens/Seat';
 import Register from './screens/Register';
-
+import FlightDetails from './screens/FlightDetails';
+import AdminDashboard from './screens/AdminDashboard';
 const Stack = createNativeStackNavigator();
 
 
@@ -28,7 +29,9 @@ export default function App() {
       <Stack.Screen name="ResultSearchFlight" component={ResultSearchFlight} />
       <Stack.Screen name="Register" component={Register} />
       <Stack.Screen name="Seat" component={Seat} />
-      
+      <Stack.Screen name="FlightDetails" component={FlightDetails} />
+      <Stack.Screen name="AdminDashboard" component={AdminDashboard} />
+    
     </Stack.Navigator>
   </NavigationContainer>
 

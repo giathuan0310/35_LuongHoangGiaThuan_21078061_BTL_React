@@ -86,7 +86,7 @@ app.post('/login', (req, res) =>{
             return res.status(500).json({ success: false, message: 'Lỗi server' });
         }
         if (results.length > 0) {
-            res.json({ success: true, message: 'Đăng nhập thành công', user: results[0] });
+            res.json({ success: true, message: 'Đăng nhập thành công', user: results[0], role: results[0].role });
         } else {
             res.json({ success: false, message: 'Đăng nhập thất bại' });
         }
@@ -103,9 +103,10 @@ app.get('/avatar/:username', (req, res) => {
             return res.status(500).json({ error: 'Database error' });
         }
         if (result.length > 0) {
+           
             res.json({ avatar: result[0].avatar });
         } else {
-            res.status(404).json({ message: 'User not found' });
+            res.status(404).json({ success: false, message: 'Không tìm thấy avatar cho người dùng này' });
         }
     });
 });

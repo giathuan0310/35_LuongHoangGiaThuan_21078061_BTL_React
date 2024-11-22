@@ -66,14 +66,18 @@ app.post('/register', upload.single('avatar'), (req, res) => {
         if (results.length > 0) {
             return res.json({ success: false, message: 'Tài khoản đã tồn tại' });
         }
-        // Nếu chưa có tài khoản, thêm mới vào cơ sở dữ liệu
-        const insertquery = 'INSERT INTO users (username, password, avatar) VALUES (?, ?, ?)';
-        db.query(insertquery, [username, password, avatar], (err, kq) => {
-            if (err) throw err;
-            res.json({ success: true, message: 'Đã thêm người dùng' });
+        // Nếu chưa có tài khoản, thêm mới vào cơ sở dữ liệu với role mặc định là 'user'
+        const insertquery = 'INSERT INTO users (username, password, avatar, role) VALUES (?, ?, ?, ?)';
+        db.query(insertquery, [username, password, avatar, 'user'], (err, kq) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ success: false, message: 'Lỗi khi tạo người dùng' });
+            }
+            res.json({ success: true, message: 'Đã thêm người dùng', userId: kq.insertId });
         });
     });
 });
+
 
 
 // kiem tra dang nhap

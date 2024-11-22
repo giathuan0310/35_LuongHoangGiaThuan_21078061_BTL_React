@@ -24,6 +24,23 @@ const Flighttrip = ({ route, navigation }) => {
     const [showDetails3, setShowDetails3] = useState(false);
     const [country, setCountry] = useState([]);
 
+    //
+    const [fromCountry, setFromCountry] = useState(''); // Lưu quốc gia được chọn
+    const [toCountry, setToCountry] = useState('');
+   // Hàm xử lý chọn quốc gia cho From
+const handleFromCountrySelect = (countryName) => {
+    setFromCountry(countryName);  // Chỉ cập nhật ô "From"
+    setModalVisible1(false);      // Đóng Modal "From"
+};
+
+// Hàm xử lý chọn quốc gia cho To
+const handleToCountrySelect = (countryName) => {
+    setToCountry(countryName);    // Chỉ cập nhật ô "To"
+    setModalVisible2(false);      // Đóng Modal "To"
+};
+
+
+
     const toggleDetails = () => {
         setShowDetails(!showDetails);
      
@@ -144,13 +161,15 @@ const Flighttrip = ({ route, navigation }) => {
 
                     <TouchableOpacity style={styles.inputContainer} onPress={() => setModalVisible1(true)}>
                     <MaterialIcons name="flight-takeoff" size={24} color="black" />
-                    <TextInput style={styles.input} placeholder="From" />
+                    <TextInput style={styles.input} placeholder="From" value={fromCountry}/>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.inputContainer} onPress={() => setModalVisible2(true)}>
                     <MaterialIcons name="flight-land" size={24} color="black" />
-                    <TextInput style={styles.input} placeholder="To" />
+                    <TextInput style={styles.input} placeholder="To" value={toCountry}/>
                     <FontAwesome name="exchange" size={20} color="gray" style={styles.swapIcon} />
                     </TouchableOpacity>
+
+                     {/* Thêm ô chọn ngày đi */}
                     <View style={styles.departcontainer}>
                         <TouchableOpacity style={styles.dateInput} onPress={() => setShowDepartureCalendar(true)}>
                             <MaterialIcons name="date-range" size={24} color="black" />
@@ -187,6 +206,9 @@ const Flighttrip = ({ route, navigation }) => {
                         )}
                     </View>
 
+
+
+                        {/* Multi-city */}
                 <View style={styles.dateContainer}>
                  
                     
@@ -357,13 +379,13 @@ const Flighttrip = ({ route, navigation }) => {
                             <Text style={styles.modalTitle}>Where from ?</Text>
                             <TouchableOpacity style={styles.inputContainer} onPress={() => setModalVisible1(true)}>
                                 <MaterialIcons name="flight-takeoff" size={24} color="black" />
-                                <TextInput style={styles.input} placeholder="From" />
+                                <TextInput style={styles.input} placeholder="From" value={fromCountry}/>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.inputContainer}>
+                            {/* <TouchableOpacity style={styles.inputContainer}>
                                 <MaterialIcons name="flight-land" size={24} color="black" />
                                 <TextInput style={styles.input} placeholder="To" />
                                 <FontAwesome name="exchange" size={20} color="gray" style={styles.swapIcon} />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
 
 
                             <View style={styles.selectcontainer}>
@@ -372,7 +394,16 @@ const Flighttrip = ({ route, navigation }) => {
                                     keyExtractor={(item) => item.id.toString()} // Đảm bảo key là duy nhất
                                     renderItem={({ item }) => (
                                 
-                                <TouchableOpacity style={styles.countryContainer} onPress={toggleDetails}>
+                                <TouchableOpacity style={styles.countryContainer} 
+                                // onPress={toggleDetails}
+                                onPress={() =>{
+                                    toggleDetails();
+                                    handleFromCountrySelect(item.tenquocgia)
+                                    
+                                }  
+
+                                } // Chọn quốc gia
+                                >
                                     <View style={styles.header}>
                                         <MaterialIcons name="location-on" size={24} color="gray" />
                                         <View style={styles.textContainer}>
@@ -424,7 +455,11 @@ const Flighttrip = ({ route, navigation }) => {
                                     data={country.slice(2, 3)} // Dữ liệu đầu vào của FlatList
                                     keyExtractor={(item) => item.id.toString()} // Đảm bảo key là duy nhất
                                     renderItem={({ item }) => (
-                                <TouchableOpacity style={styles.countryContainer} onPress={toggleDetails2}>
+                                <TouchableOpacity style={styles.countryContainer} 
+                                // onPress={toggleDetails2}
+                                onPress={() =>{toggleDetails2();
+                                     handleFromCountrySelect(item.tenquocgia)}} // Chọn quốc gia
+                                >
                                     <View style={styles.header}>
                                         <MaterialIcons name="location-on" size={24} color="gray" />
                                         <View style={styles.textContainer}>
@@ -482,13 +517,13 @@ const Flighttrip = ({ route, navigation }) => {
                                 <MaterialIcons name="close" size={25} color="black" />
                             </TouchableOpacity>
                             <Text style={styles.modalTitle}>Where to ?</Text>
-                            <TouchableOpacity style={styles.inputContainer} >
+                            {/* <TouchableOpacity style={styles.inputContainer} >
                                 <MaterialIcons name="flight-takeoff" size={24} color="black" />
                                 <TextInput style={styles.input} placeholder="From" />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                             <TouchableOpacity style={styles.inputContainer} onPress={() => setModalVisible2(true)}>
                                 <MaterialIcons name="flight-land" size={24} color="black" />
-                                <TextInput style={styles.input} placeholder="To" />
+                                <TextInput style={styles.input} placeholder="To" value={toCountry}/>
                                 <FontAwesome name="exchange" size={20} color="gray" style={styles.swapIcon} />
                             </TouchableOpacity>
 
@@ -499,7 +534,11 @@ const Flighttrip = ({ route, navigation }) => {
                                     keyExtractor={(item) => item.id.toString()} // Đảm bảo key là duy nhất
                                     renderItem={({ item }) => (
 
-                                        <TouchableOpacity style={styles.countryContainer} onPress={toggleDetails}>
+                                        <TouchableOpacity style={styles.countryContainer}  
+                                        onPress={() =>{
+                                            toggleDetails();
+                                            handleToCountrySelect(item.tenquocgia)}} // Chọn quốc gia
+                                       >
                                             <View style={styles.header}>
                                                 <MaterialIcons name="location-on" size={24} color="gray" />
                                                 <View style={styles.textContainer}>
@@ -551,7 +590,10 @@ const Flighttrip = ({ route, navigation }) => {
                                     data={country.slice(2, 3)} // Dữ liệu đầu vào của FlatList
                                     keyExtractor={(item) => item.id.toString()} // Đảm bảo key là duy nhất
                                     renderItem={({ item }) => (
-                                        <TouchableOpacity style={styles.countryContainer} onPress={toggleDetails2}>
+                                        <TouchableOpacity style={styles.countryContainer}  
+                                        onPress={() =>{toggleDetails2();
+                                            handleToCountrySelect(item.tenquocgia)}} // Chọn quốc gia
+                                       >
                                             <View style={styles.header}>
                                                 <MaterialIcons name="location-on" size={24} color="gray" />
                                                 <View style={styles.textContainer}>
@@ -603,7 +645,14 @@ const Flighttrip = ({ route, navigation }) => {
                 
                 {/* END Modal TO */}
 
-                <TouchableOpacity style={styles.searchButton}  onPress={() => navigation.navigate('ResultSearchFlight')}>
+                <TouchableOpacity style={styles.searchButton}  onPress={() => navigation.navigate('ResultSearchFlight',{
+                        fromCountry: fromCountry,
+                        toCountry: toCountry,
+                        departureDate: departureDate,
+                        returnDate: returnDate,
+                        totalPassengers: totalPassengers
+
+                })}>
                     <Text style={styles.searchButtonText}>Search flights</Text>
                 </TouchableOpacity>
             </ScrollView>

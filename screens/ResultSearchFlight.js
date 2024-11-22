@@ -9,14 +9,14 @@ import { FontAwesome5 } from '@expo/vector-icons'; // Sử dụng FontAwesome5Li
 
 
 
-const ResultSearchFlight = () => {
+const ResultSearchFlight = ({ route, navigation }) => {
     const [flightData, setflightData] = useState([]);
     const [airlineData, setAirlineData] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedstop, setSelectedStop] = useState('Any stops');
     const [selectAll, setSelectAll] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
-
+    const { fromCountry, toCountry, departureDate, returnDate,totalPassengers } = route.params;
     useEffect(() => {
         axios.get('http://localhost:3000/flight').then((respone) => {
             setflightData(respone.data);
@@ -111,7 +111,12 @@ const ResultSearchFlight = () => {
         setSelectedItems([]);      // Bỏ chọn tất cả các checkbox
     };
     
-
+// Định nghĩa hàm formatDateWithDay
+const formatDateWithDay = (date) => {
+    const options = {month: 'long', day: 'numeric' };
+    return new Date(date).toLocaleDateString('en-US', options);  // hoặc ngôn ngữ khác tùy ý
+  };
+  
 
     return (
         <View style={styles.container}>
@@ -120,8 +125,8 @@ const ResultSearchFlight = () => {
                     <MaterialIcons name="arrow-back"  size={30} color="black" />
                 </TouchableOpacity>
                 <View style={styles.headerInfo}>
-                    <Text style={styles.route}>London - New York</Text>
-                    <Text style={styles.date}>Jul 14 - Jul 17, 1 traveller</Text>
+                    <Text style={styles.route}>{`${fromCountry} - ${toCountry}`}</Text>
+                    <Text style={styles.date}>{`${formatDateWithDay(departureDate)} - ${formatDateWithDay(returnDate)}, ${totalPassengers} traveller`}</Text>
                 </View>
                 <TouchableOpacity style={styles.iconbell}>
                     <MaterialIcons name="notifications" size={30} color="black" />

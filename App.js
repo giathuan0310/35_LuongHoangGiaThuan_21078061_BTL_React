@@ -13,13 +13,14 @@ import Seat from './screens/Seat';
 import Register from './screens/Register';
 import FlightDetails from './screens/FlightDetails';
 import AdminDashboard from './screens/AdminDashboard';
+
 const Stack = createNativeStackNavigator();
 
 
 export default function App() {
   return (
     <NavigationContainer>
-    <Stack.Navigator initialRouteName='LoginScreen' screenOptions={{headerShown: false}}>
+    <Stack.Navigator initialRouteName='Flighttrip' screenOptions={{headerShown: false}}>
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
       <Stack.Screen name="Home" component={Home} />
       
@@ -31,7 +32,7 @@ export default function App() {
       <Stack.Screen name="Seat" component={Seat} />
       <Stack.Screen name="FlightDetails" component={FlightDetails} />
       <Stack.Screen name="AdminDashboard" component={AdminDashboard} />
-    
+     
     </Stack.Navigator>
   </NavigationContainer>
 

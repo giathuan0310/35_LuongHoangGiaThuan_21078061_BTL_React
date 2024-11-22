@@ -175,6 +175,28 @@ app.get('/airline', (req, res) => {
 });
 
 
+app.post('/createInvoice', (req, res) => {
+    const { firstName, lastName, seatClass, tab } = req.body;
+
+    // Kiểm tra xem các tham số có tồn tại không
+    if (!firstName || !lastName || !seatClass || !tab) {
+        return res.status(400).json({ success: false, message: 'Thiếu thông tin cần thiết' });
+    }
+
+    // Tạo câu lệnh SQL để lưu dữ liệu vào bảng hdmaybay
+    const sql = 'INSERT INTO hdmaybay (traveller, class, flight) VALUES (?, ?, ?)';
+
+    // Kết nối và thực thi câu lệnh
+    db.query(sql, [`${firstName} ${lastName}`, seatClass, tab], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ success: false, message: 'Lỗi khi lưu thông tin hóa đơn' });
+        }
+        res.json({ success: true, message: 'Đã lưu hóa đơn thành công', invoiceId: result.insertId });
+    });
+});
+
+
 
 
 

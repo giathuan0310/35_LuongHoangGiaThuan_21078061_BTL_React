@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, Pressable, FlatList,TouchableOpacity } from "re
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 export default function Seat({ route, navigation }) {
   const [isChecked, setChecked] = useState(false);
+  const [totalPrice1, setTotalPrice] = useState(0);
   const [checkboxData, setCheckboxData] = useState([
     { id: 1, label: "Option 1", isChecked: false },
     { id: 2, label: "Option 2", isChecked: false },
@@ -42,9 +43,16 @@ export default function Seat({ route, navigation }) {
 
   const handleCheckboxChange = (id, data, setData) => {
     setData((prevData) =>
-      prevData.map((item) =>
-        item.id === id ? { ...item, isChecked: !item.isChecked } : item
-      )
+      prevData.map((item) => {
+        if (item.id === id) {
+          const newCheckedState = !item.isChecked;
+          setTotalPrice((prevPrice) =>
+            newCheckedState ? prevPrice + 5.68 : prevPrice - 5.68
+          );
+          return { ...item, isChecked: newCheckedState };
+        }
+        return item;
+      })
     );
   };
 
@@ -193,12 +201,20 @@ export default function Seat({ route, navigation }) {
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
             Select Seat 1 of 1
           </Text>
-          <Text>Seat 3D - $5.68</Text>
+          <View>
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>Total Price: ${totalPrice1.toFixed(2)}</Text>
+        </View>
         </View>
 
         <View>
           <Pressable style={styles.btnSelect}>
-            <Text style={{ color: "white", fontWeight: "bold" }}>Select</Text>
+            <Text style={{ color: "white", fontWeight: "bold" }}
+            onPress={()=> navigation.navigate('TravellerInformation',{
+             
+
+            })}
+            
+            >Select</Text>
           </Pressable>
         </View>
       </View>

@@ -241,7 +241,19 @@ const formatDateWithDay = (date) => {
 
                         </View>
                         <TouchableOpacity style={styles.selectButton} 
-                        onPress={() => navigation.navigate('TravellerInformation')}
+                        onPress={() => navigation.navigate('TravellerInformation',{
+
+                            totalPrice,
+                            flight, 
+                            fromCountry, 
+                            toCountry, 
+                            departureDate, 
+                            returnDate, 
+                            totalPassengers, 
+                            seatClass,
+                            tab,
+                        })}
+                           
                         >
                             <Text style={styles.selectButtonText}>Select</Text>
                         </TouchableOpacity>

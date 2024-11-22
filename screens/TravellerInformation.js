@@ -7,7 +7,7 @@ import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import { CheckBox } from 'react-native-web';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
-const TravellerInformation = () => {
+const TravellerInformation = ({route}) => {
     const navigation = useNavigation(); // Initialize navigation
     //Step1
     const [firstName, setFirstName] = useState('');
@@ -15,24 +15,66 @@ const TravellerInformation = () => {
     const [gender, setGender] = useState('');
     const [email, setEmail] = useState('');   
     const [phone, setPhone] = useState('+07');   
-  
+    const [totalPrice, setTotalPrice] = useState(route.params.totalPrice || 0);
+    
+
     
      //Step 2
     // Trạng thái cho các mục checkbox, sử dụng một object để lưu trữ các mục đã chọn
     const [selectedOptions, setSelectedOptions] = useState({
-        personalItem: false,
-        checkedBag: false,
-        noCheckedBag: false,
-        protect: false,
-        noInsurance: false,
-    });
+      personalItem: false,
+      checkedBag: false,
+      noCheckedBag: true, // Default
+      protect: false,
+      noInsurance: true, // Default
+  });
 
-    const handleCheckboxPress = (option) => {
-        setSelectedOptions((prevOptions) => ({
-            ...prevOptions,
-            [option]: !prevOptions[option], // Chuyển đổi trạng thái của mục đã chọn
-        }));
-    };
+  const handleCheckboxPress = (option) => {
+    let updatedOptions = { ...selectedOptions };
+
+    // Reset dependent options
+    if (option === "checkedBag" || option === "noCheckedBag") {
+        updatedOptions.checkedBag = false;
+        updatedOptions.noCheckedBag = false;
+    }
+
+    if (option === "protect" || option === "noInsurance") {
+        updatedOptions.protect = false;
+        updatedOptions.noInsurance = false;
+    }
+
+    // Update selected option
+    updatedOptions[option] = !updatedOptions[option];
+
+    // Calculate new total price
+    let newTotalPrice = route.params.totalPrice || 0;
+
+    if (updatedOptions.checkedBag) {
+        newTotalPrice += 19.99;
+    }
+    if (updatedOptions.protect) {
+        newTotalPrice += 19.99;
+    }
+
+    // Update state
+    setSelectedOptions(updatedOptions);
+    setTotalPrice(newTotalPrice);
+};
+
+
+//stepp 3
+const { 
+  flight, 
+  fromCountry, 
+  toCountry, 
+  departureDate, 
+  returnDate, 
+  totalPassengers, 
+  seatClass,
+  tab,
+ 
+} = route.params;
+
 
 
     //Step4 Thanh Toán
@@ -87,11 +129,47 @@ const TravellerInformation = () => {
   
     
 
-    const handlePaymentSuccess = () => {
-        // Navigate to the PaymentSuccess screen
-       
-        navigation.navigate('PaymentSuccess');
+      const handlePaymentSuccess = () => {
+        // Gửi yêu cầu POST đến API /createInvoice
+        fetch('http://localhost:3000/createInvoice', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                firstName: firstName,
+                lastName: lastName,
+                seatClass: seatClass,
+                tab: tab, // flight
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Chuyển hướng đến màn hình PaymentSuccess nếu lưu thành công
+                navigation.navigate('PaymentSuccess', {
+                    flight: tab,
+                    fromCountry,
+                    toCountry,
+                    departureDate,
+                    returnDate,
+                    firstName,
+                    lastName,
+                    seatClass,
+                    tab,
+                });
+            } else {
+                alert('Lỗi khi lưu hóa đơn');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi gửi yêu cầu');
+        });
     };
+    
+    
+    
     return (
         <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
@@ -112,7 +190,7 @@ const TravellerInformation = () => {
                                  completedStepIconBorderColor="#00BDD6"  // Màu viền của bước đã hoàn thành
                            >
                                 {/* Step1 */}
-                                <ProgressStep label={<Ionicons name="person" size={24} color="black" style={styles.backIcon} />}>
+                                <ProgressStep  label={<Ionicons name="person" size={24} color="black" style={styles.backIcon} />}>
                                 <Text style={styles.title}>Traveller information</Text>
                                 <View style={styles.hr}/>
                                         {/* Phần  body*/}
@@ -176,7 +254,8 @@ const TravellerInformation = () => {
                                         {/* footer */}
                                         <View style={styles.hr}/>
                                         <View style={styles.buttonContainer}>
-                                                <Text style={styles.price}>$806</Text> 
+                                                <Text style={styles.price}>${totalPrice}</Text> 
+                                                <Text style={styles.totalpricebagge}>1 adult</Text>
                                         </View>
                                 </ProgressStep>
 
@@ -201,26 +280,26 @@ const TravellerInformation = () => {
                                             <View style={styles.hr}/>
                                             <label style={styles.textLabel}>Checked bags</label>
                                             <TouchableOpacity onPress={() => handleCheckboxPress("checkedBag")} style={styles.checkboxContainer}>
-                                                <View style={{ flexDirection: 'row' }}>
-                                                    <Ionicons name="briefcase" size={20} color="black" />
-                                                    <Text style={styles.checkboxText}>1 checked bag (Max weight 22.1 lbs)</Text>
-                                                    <View style={styles.checkbox}>
-                                                        {selectedOptions.checkedBag && <Ionicons name="radio-button-on" size={15} color="#00BDD5" />}
-                                                    </View>
-                                                </View>
-                                                <Text style={styles.checkboxSubtext}>from $19.99</Text>
-                                            </TouchableOpacity>
+                                                  <View style={{ flexDirection: 'row' }}>
+                                                      <Ionicons name="briefcase" size={20} color="black" />
+                                                      <Text style={styles.checkboxText}>1 checked bag (Max weight 22.1 lbs)</Text>
+                                                      <View style={styles.checkbox}>
+                                                          {selectedOptions.checkedBag && <Ionicons name="radio-button-on" size={15} color="#00BDD5" />}
+                                                      </View>
+                                                  </View>
+                                                  <Text style={styles.checkboxSubtext}>from $19.99</Text>
+                                              </TouchableOpacity>
 
-                                            <TouchableOpacity onPress={() => handleCheckboxPress("noCheckedBag")} style={styles.checkboxContainer}>
-                                                <View style={{ flexDirection: 'row' }}>
-                                                    <Ionicons name="remove-circle" size={20} color="black" />
-                                                    <Text style={styles.checkboxText}>No checked bags</Text>
-                                                    <View style={styles.checkbox}>
-                                                        {selectedOptions.noCheckedBag && <Ionicons name="radio-button-on" size={15} color="#00BDD5" />}
-                                                    </View>
-                                                </View>
-                                                <Text style={styles.checkboxSubtext}>$00.00</Text>
-                                            </TouchableOpacity>
+                                              <TouchableOpacity onPress={() => handleCheckboxPress("noCheckedBag")} style={styles.checkboxContainer}>
+                                                  <View style={{ flexDirection: 'row' }}>
+                                                      <Ionicons name="remove-circle" size={20} color="black" />
+                                                      <Text style={styles.checkboxText}>No checked bags</Text>
+                                                      <View style={styles.checkbox}>
+                                                          {selectedOptions.noCheckedBag && <Ionicons name="radio-button-on" size={15} color="#00BDD5" />}
+                                                      </View>
+                                                  </View>
+                                                  <Text style={styles.checkboxSubtext}>$00.00</Text>
+                                              </TouchableOpacity>
 
                                             <View style={styles.hr}/>
                                             <label style={styles.textLabel}>Travel protection</label>
@@ -250,7 +329,7 @@ const TravellerInformation = () => {
                                         </View>
                                     </View>
                                     <View style={styles.buttonContainer}>
-                                        <Text style={styles.price}>$806</Text> 
+                                        <Text style={styles.price}>${totalPrice.toFixed(2)}</Text> 
                                     </View>
                                 </ProgressStep>
                                 {/* Step3 */}
@@ -262,12 +341,12 @@ const TravellerInformation = () => {
                                         <View style={styles.bodyiInput}>
                                                         
                                                         <View style={styles.containInput}>
-                                                                <label style={styles.textLabel}>Flight to New York</label>
+                                                                <label style={styles.textLabel}>Flight to {fromCountry}</label>
                                                                
                                                                 <View style={{ flexDirection: 'row',justifyContent:'space-around' }}>
                                                                         <Image source={require('../assets/seat.png')}  />
                                                                             <View>
-                                                                                <Text>LCY - JFK</Text>
+                                                                                <Text>{flight[0].airline}</Text>
                                                                                 <Text style={styles.checkboxSubtext}>Seats from $5</Text>
                                                                             </View>
                                                                             <TouchableOpacity  onPress={()=> navigation.navigate('Seat')} >
@@ -277,15 +356,15 @@ const TravellerInformation = () => {
 
                                                                 <View style={styles.hr}/>
                                                        
-                                                                <label style={styles.textLabel}>Flight to London</label>
+                                                                <label style={styles.textLabel}>Flight to {toCountry}</label>
                                                                
                                                                 <View style={{ flexDirection: 'row',justifyContent:'space-around' }}>
                                                                         <Image source={require('../assets/seat.png')}  />
                                                                             <View>
-                                                                                <Text>LCY - JFK</Text>
+                                                                                <Text>{flight[0].airline}</Text>
                                                                                 <Text style={styles.checkboxSubtext}>Seats from $4.59</Text>
                                                                             </View>
-                                                                            <TouchableOpacity  >
+                                                                            <TouchableOpacity   onPress={()=> navigation.navigate('Seat')}>
                                                                                     <Text style={{color:"#B7AADB"}}>Select</Text>
                                                                             </TouchableOpacity>   
                                                                 </View>
@@ -297,7 +376,7 @@ const TravellerInformation = () => {
                                         {/* footer */}
                                         <View style={styles.hr}/>
                                         <View style={styles.buttonContainer}>
-                                                <Text style={styles.price}>$806</Text> 
+                                                <Text style={styles.price}>${totalPrice.toFixed(2)}</Text> 
                                         </View>
 
                                 </ProgressStep>
@@ -330,11 +409,11 @@ const TravellerInformation = () => {
                                                                 <View style={{ flexDirection: 'row',justifyContent:'space-around' }}>
                                                                         <Image  source={require('../assets/profileicon1.png')}  />
                                                                             <View>
-                                                                                <Text>Pedro Moreno</Text>
+                                                                                <Text>{firstName}{lastName} </Text>
                                                                                 
                                                                             </View>
                                                                            
-                                                                            <Text style={{color:"#AFB1B4"}}>Adult -Male</Text>
+                                                                            <Text style={{color:"#AFB1B4"}}>Adult -{gender}</Text>
                                                                                
                                                                 </View>
 
@@ -345,7 +424,7 @@ const TravellerInformation = () => {
                                                                 <View style={{ flexDirection: 'row',justifyContent:'space-around' }}>
                                                                         <Image source={require('../assets/mail.png')}  />
                                                                             <View>
-                                                                                <Text>pedromoreno@gmail.com</Text>
+                                                                                <Text>{email}</Text>
             
                                                                             </View>
                                                                               
@@ -354,7 +433,7 @@ const TravellerInformation = () => {
                                                                 <View style={{ flexDirection: 'row',justifyContent:'space-around' }}>
                                                                         <Image source={require('../assets/phone.png')}  />
                                                                             <View>
-                                                                                <Text>(208)567-8209</Text>
+                                                                                <Text>{phone}</Text>
             
                                                                             </View>
                                                                               
@@ -368,11 +447,11 @@ const TravellerInformation = () => {
                                             {/* footer */}
                                         <View style={styles.hr}/>
                                         <View style={styles.buttonContainer}>
-                                                <Text style={styles.price}>$806</Text> 
+                                                <Text style={styles.price}>${totalPrice.toFixed(2)}</Text> 
                                         </View>
 
                                         {/* Thêm nút riêng để gọi handlePaymentSuccess */}
-                <TouchableOpacity style={styles.submitButton} onPress={handlePaymentSuccess}>
+                    <TouchableOpacity style={styles.submitButton} onPress={handlePaymentSuccess}>
                     <Text style={styles.submitButtonText}>Submit</Text>
                 </TouchableOpacity>
                                 </ProgressStep>

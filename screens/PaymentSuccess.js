@@ -12,10 +12,26 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Ionicons,MaterialIcons } from '@expo/vector-icons';
 
-const PaymentSuccess = () => {
+const PaymentSuccess = ({route}) => {
     const navigation = useNavigation();
-
-
+    const { 
+        flight, 
+        fromCountry, 
+        toCountry, 
+        departureDate, 
+        returnDate, 
+        totalPassengers, 
+        seatClass,
+        tab,
+        lastName,
+        firstName
+       
+      } = route.params;
+ // Định nghĩa hàm formatDateWithDay
+ const formatDateWithDay = (date) => {
+    const options = {weekday: 'short',month: 'short', day: 'numeric' };
+    return new Date(date).toLocaleDateString('en-US', options);  // hoặc ngôn ngữ khác tùy ý
+  };
     return (
         <SafeAreaView style={styles.safeArea}>
             <Image source={require('../assets/banner3.jpg')} style={styles.banner} />
@@ -35,13 +51,17 @@ const PaymentSuccess = () => {
                                                 <View style={{ flexDirection: 'row',justifyContent:'space-around' }}>
                                                                        
                                                                             <View>
-                                                                                <Text>LCY </Text>
-                                                                                <Text style={{fontSize: 12,color: 'gray',}}>Tue,Jul 14</Text>
+                                                                                <Text>{flight[0].airline} </Text>
+                                                                                <Text style={{fontSize: 12,color: 'gray',}}>
+                                                                                {`${formatDateWithDay(departureDate)} `}           
+
+
+                                                                                </Text>
                                                                             </View>
                                                                             <Ionicons name="swap-horizontal" size={24} color="black" />
                                                                             <View>
-                                                                                <Text>JFK</Text>
-                                                                                <Text style={{fontSize: 12,color: 'gray',}}>Fri,Jul 17</Text>
+                                                                                <Text>{flight[1].airline}</Text>
+                                                                                <Text style={{fontSize: 12,color: 'gray',}}> {`${formatDateWithDay( returnDate)} `}</Text>
                                                                             </View>
                                                 </View>
                     
@@ -50,15 +70,15 @@ const PaymentSuccess = () => {
                                                                        
                                                                             <View>
                                                                                 <Text style={{fontSize: 12,color: 'gray',}}>Traveller</Text>
-                                                                                <Text >Pedro Moreno</Text>
+                                                                                <Text >{firstName}{lastName}</Text>
                                                                             </View>
                                                                             <View>
                                                                                 <Text style={{fontSize: 12,color: 'gray',}}>Class</Text>
-                                                                                <Text >Economy</Text>
+                                                                                <Text >{seatClass}</Text>
                                                                             </View>
                                                                             <View>
                                                                                 <Text style={{fontSize: 12,color: 'gray',}}>Flight</Text>
-                                                                                <Text >Round-trip</Text>
+                                                                                <Text >{tab}</Text>
                                                                             </View>
                                                 </View>
 

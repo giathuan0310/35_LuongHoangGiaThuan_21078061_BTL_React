@@ -16,7 +16,7 @@ const ResultSearchFlight = ({ route, navigation }) => {
     const [selectedstop, setSelectedStop] = useState('Any stops');
     const [selectAll, setSelectAll] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
-    const { fromCountry, toCountry, departureDate, returnDate,totalPassengers } = route.params;
+    const { fromCountry, toCountry, departureDate, returnDate,totalPassengers,tab, seatClass } = route.params;
     useEffect(() => {
         axios.get('http://localhost:3000/flight').then((respone) => {
             setflightData(respone.data);
@@ -47,8 +47,21 @@ const ResultSearchFlight = ({ route, navigation }) => {
         pairs[pairIndex].push(flight);
         return pairs;
       }, []);
-      const navigateToFlightDetails = (flight) => {
-        navigation.navigate('FlightDetails', { flight }); // Truyền thông tin chuyến bay đến màn hình chi tiết
+      const navigateToFlightDetails = (flight,totalPrice) => {
+        navigation.navigate('FlightDetails',
+            
+            { flight ,
+                 totalPrice,
+                fromCountry, // Add fromCountry
+                toCountry, // Add toCountry
+                departureDate, // Add departureDate
+                returnDate, // Add returnDate
+                totalPassengers, // Add totalPassengers
+                seatClass,
+                tab, // Add seatClass
+              
+
+            }); // Truyền thông tin chuyến bay đến màn hình chi tiết
       };
 
     const renderFlightPair = ({ item }) => {
@@ -57,7 +70,7 @@ const ResultSearchFlight = ({ route, navigation }) => {
 
         return (
 
-            <TouchableOpacity key={item[0].id} onPress={() => navigateToFlightDetails(item[0])}>
+            <TouchableOpacity key={item[0].id} onPress={() => navigateToFlightDetails(item,totalPrice)}>
              <View style={styles.cardPair}>
                 {item.map((flight, index) => (
                     <View key={index} style={styles.card}>

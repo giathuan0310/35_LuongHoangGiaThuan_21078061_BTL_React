@@ -650,7 +650,9 @@ const handleToCountrySelect = (countryName) => {
                         toCountry: toCountry,
                         departureDate: departureDate,
                         returnDate: returnDate,
-                        totalPassengers: totalPassengers
+                        totalPassengers: totalPassengers,
+                        seatClass: seatClass,
+                        tab:tab,
 
                 })}>
                     <Text style={styles.searchButtonText}>Search flights</Text>

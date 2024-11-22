@@ -5,8 +5,25 @@ import axios from 'axios';
 import { CheckBox } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons'; // Sử
 
-const FlightDetails = () => {
-
+const FlightDetails = ({ route,navigation}) => {
+    const { 
+        flight, 
+        fromCountry, 
+        toCountry, 
+        departureDate, 
+        returnDate, 
+        totalPassengers, 
+        seatClass,
+        tab,
+        totalPrice
+    } = route.params;
+    const flight1 = flight[0]; // Phần tử đầu tiên
+    const flight2 = flight[1]; // Phần tử thứ hai (nếu có)
+    // Định nghĩa hàm formatDateWithDay
+const formatDateWithDay = (date) => {
+    const options = {month: 'short', day: 'numeric' };
+    return new Date(date).toLocaleDateString('en-US', options);  // hoặc ngôn ngữ khác tùy ý
+  };
     return (
         <View style={styles.container}>
             <ScrollView>
@@ -14,7 +31,7 @@ const FlightDetails = () => {
 
                 <View style={styles.headerInfo}>
                     <TouchableOpacity style={styles.iconmuiten}>
-                        <MaterialIcons name="arrow-back" size={30} color="black" />
+                        <MaterialIcons name="arrow-back" onPress={() => navigation.goBack()} size={30} color="black" />
                     </TouchableOpacity>
                     <Text style={styles.route}>Flight details</Text>
                 </View>
@@ -29,51 +46,50 @@ const FlightDetails = () => {
                 </View>
             </View>
             <View style={styles.yourtripcontainer}>
-                <Text style={styles.yourtriptitle}>Your trip to New York</Text>
-                <Text style={styles.yourtriptitle2}>from London</Text>
+                <Text style={styles.yourtriptitle}>Your trip to {toCountry}</Text>
+                <Text style={styles.yourtriptitle2}>from {fromCountry}</Text>
                 <View style={styles.yourtripdate}>
-                    <Text style={styles.datefromto}>Fri, Jul 14 - Sun, Jul 17</Text>
+                    <Text style={styles.datefromto}>
+                    {`${formatDateWithDay(departureDate)} - ${formatDateWithDay(returnDate)}`}
+
+                    </Text>
                 </View>
 
 
                 <TouchableOpacity style={styles.passengerContainer} >
                     <View style={styles.hanhkhachcontainer}>
                         <FontAwesome name="child" size={20} color="gray" style={styles.swapIcon} />
-                        <Text style={styles.passengerText}>1 traveller</Text>
+                        <Text style={styles.passengerText}>{totalPassengers}</Text>
                         <MaterialIcons name="circle" size={6} color="gray" style={styles.swapIcon} />
                     </View>
                     <View style={styles.hangghecontainer}>
                         <MaterialIcons name="airline-seat-recline-normal" size={20} color="gray" style={styles.swapIcon} />
-                        <Text style={styles.classText}>Economy</Text>
+                        <Text style={styles.classText}>{seatClass}</Text>
                     </View>
                     <View style={styles.trip}>
                         <MaterialIcons name="circle" size={6} color="gray" style={styles.swapIcon} />
                         <MaterialIcons name="flight" size={20} color="gray" style={styles.swapIcon} />
-                        <Text style={styles.roundtripText}>Round-trip</Text>
+                        <Text style={styles.roundtripText}>{tab}</Text>
                     </View>
                 </TouchableOpacity>
                 <View style={styles.sanbay}>
-                    <Text style={styles.sanbayText}>London - New York city</Text>
+                    <Text style={styles.sanbayText}>{`${fromCountry} - ${toCountry}`}</Text>
                     <View style={styles.sanbayDetails}>
-                    <Text style={styles.sanbayName}>SkyHaven</Text>
+                    <Text style={styles.sanbayName}>{flight1.airline}</Text>
                     <Text style={styles.sanbaySubName}>FD695</Text>
                     </View>
                 </View>
 
                 <View style={styles.timefromto}>
                     <View style={styles.timefromtoitem}>
-                        <Text style={styles.timefrom}>6:30 AM</Text>
-                        <Text style={styles.datefrom}>Tue, Jul 14</Text>
+                        <Text style={styles.timefrom}>{flight1.time}</Text>
+                        <Text style={styles.datefrom}>{`${formatDateWithDay(departureDate)} - ${formatDateWithDay(returnDate)}`}</Text>
                     </View>
                     <View style={styles.dungchan}>
-                        <Text style={styles.solandung}>1 stop</Text>
-                        <Text style={styles.timecount}>7h30m</Text>
+                        <Text style={styles.solandung}>{flight1.duration}</Text>
+                        <Text style={styles.timecount}>{flight1.stops}</Text>
                     </View>
-                   
-                    <View style={styles.timefromtoitem}>
-                        <Text style={styles.timeto}>2:00 PM</Text>
-                        <Text style={styles.dateto}>Tue, Jul 14</Text>
-                    </View>
+                  
                 </View>
 
 
@@ -114,27 +130,24 @@ const FlightDetails = () => {
                     {/* Chuyen bay thu 2 */}
 
                     <View style={styles.sanbay2}>
-                        <Text style={styles.sanbayText}>London - New York city</Text>
+                        <Text style={styles.sanbayText}>{` ${toCountry}-${fromCountry} `}</Text>
                         <View style={styles.sanbayDetails}>
-                            <Text style={styles.sanbayName}>SkyHaven</Text>
+                            <Text style={styles.sanbayName}>{flight2.airline}</Text>
                             <Text style={styles.sanbaySubName}>FD695</Text>
                         </View>
                     </View>
 
                     <View style={styles.timefromto}>
                         <View style={styles.timefromtoitem}>
-                            <Text style={styles.timefrom}>6:30 AM</Text>
-                            <Text style={styles.datefrom}>Tue, Jul 14</Text>
+                            <Text style={styles.timefrom}>{flight2.time}</Text>
+                            <Text style={styles.datefrom}>{`${formatDateWithDay(departureDate)} - ${formatDateWithDay(returnDate)}`}</Text>
                         </View>
                         <View style={styles.dungchan}>
-                            <Text style={styles.solandung}>1 stop</Text>
-                            <Text style={styles.timecount}>7h30m</Text>
+                        <Text style={styles.solandung}>{flight2.duration}</Text>
+                        <Text style={styles.timecount}>{flight2.stops}</Text>
                         </View>
 
-                        <View style={styles.timefromtoitem}>
-                            <Text style={styles.timeto}>2:00 PM</Text>
-                            <Text style={styles.dateto}>Tue, Jul 14</Text>
-                        </View>
+                       
                     </View>
 
 
@@ -223,11 +236,13 @@ const FlightDetails = () => {
 
                     <View style={styles.baggagefotter}>
                         <View style={styles.totalpricebaggage}>
-                            <Text style={styles.pricebagge}>$806</Text>
+                            <Text style={styles.pricebagge}>${totalPrice}</Text>
                             <Text style={styles.totalpricebagge}>Total price</Text>
 
                         </View>
-                        <TouchableOpacity style={styles.selectButton}>
+                        <TouchableOpacity style={styles.selectButton} 
+                        onPress={() => navigation.navigate('TravellerInformation')}
+                        >
                             <Text style={styles.selectButtonText}>Select</Text>
                         </TouchableOpacity>
 
